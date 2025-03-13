@@ -1,0 +1,8 @@
+com/example/CsvProcessorStream$SumProcessWindowFunction.class
+com/example/utils/PersonParser.class
+com/example/CsvProcessorTable.class
+com/example/utils/PersonMapper.class
+com/example/domain/Person.class
+com/example/CsvProcessorStream.class
+com/example/SocketToCsv$Tokenizer.class
+com/example/SocketToCsv.class
