@@ -23,11 +23,11 @@ public class CsvProcessorTable {
         TableEnvironment tEnv = TableEnvironment.create(settings);
 
         final Schema personSchema = Schema.newBuilder()
-            .column("person_id", DataTypes.STRING())
-            .column("name", DataTypes.STRING()) 
-            .column("last_name", DataTypes.STRING()) 
-            .column("age", DataTypes.INT()) 
             .column("create_at", DataTypes.TIMESTAMP())
+            .column("person_id", DataTypes.STRING()) 
+            .column("type_transaction", DataTypes.STRING()) 
+            .column("ammount", DataTypes.INT()) 
+            .column("process_at", DataTypes.TIMESTAMP())
             .build();
 
         
@@ -36,7 +36,7 @@ public class CsvProcessorTable {
                     .option("rows-per-second", "100")
                     .option("number-of-rows", "1000")
                     .build();
-        tEnv.createTable("Person", sourceDescriptor);
+        tEnv.createTable("Transaction", sourceDescriptor);
 
         tEnv.createTemporaryTable("CsvSinkTable", TableDescriptor.forConnector("filesystem")
                 .schema(personSchema)
@@ -48,9 +48,9 @@ public class CsvProcessorTable {
                 .build());
 
         Table result = tEnv.sqlQuery(
-            "SELECT person_id, name, last_name, age, create_at " +
+            "SELECT create_at, person_id, type_transaction, ammount, process_at " +
                     "FROM Person " +
-                    "WHERE age > 18 "
+                    "WHERE type_transaction = 1 "
         );
 
         TableResult tableResult = result.executeInsert("CsvSinkTable");

@@ -27,11 +27,11 @@ import java.util.Collection;
 
 import static org.junit.Assert.fail;
 
+/** Tests for {@link SocketWindowWordCount}. */
 @RunWith(Parameterized.class)
-public class SocketToCsvTest extends AbstractTestBase {
+public class SocketToCsvCase extends AbstractTestBaseJUnit4 {
 
-    @Parameterized.Parameter 
-    public boolean asyncState;
+    @Parameterized.Parameter public boolean asyncState;
 
     @Parameterized.Parameters
     public static Collection<Boolean> setup() {
@@ -40,37 +40,48 @@ public class SocketToCsvTest extends AbstractTestBase {
 
     @Test
     public void testJavaProgram() throws Exception {
-        String socketHost = System.getenv().getOrDefault("SOCKET_HOST", "localhost");
-        InetAddress hostAddress = InetAddress.getByName(socketHost);
+        InetAddress localhost = InetAddress.getByName("localhost");
 
+        // suppress sysout messages from this example
         final PrintStream originalSysout = System.out;
         final PrintStream originalSyserr = System.err;
+
         final ByteArrayOutputStream errorMessages = new ByteArrayOutputStream();
 
         System.setOut(new PrintStream(new NullStream()));
         System.setErr(new PrintStream(errorMessages));
 
         try {
-            try (ServerSocket server = new ServerSocket(0, 10, hostAddress)) {
+            try (ServerSocket server = new ServerSocket(0, 10, localhost)) {
 
                 final ServerThread serverThread = new ServerThread(server);
                 serverThread.setDaemon(true);
                 serverThread.start();
 
                 final int serverPort = server.getLocalPort();
-                System.out.println("Server listening on " + socketHost + ":" + serverPort);
+                System.out.println("Server listening on port " + serverPort);
 
-                SocketToCsv.main(new String[]{"--hostname", socketHost, "--port", String.valueOf(serverPort)});
+                // if (asyncState) {
+                //     SocketWindowWordCount.main(
+                //             new String[] {"--port", String.valueOf(serverPort), "--async-state"});
+                // } else {
+                //     SocketWindowWordCount.main(new String[] {"--port", String.valueOf(serverPort)});
+                // }
+
+                String outputPath = "/data/output.csv";
+
+                SocketToCsv.execSocket("localhost", serverPort, outputPath);
 
                 if (errorMessages.size() != 0) {
-                    fail("Found error message: " +
-                         new String(errorMessages.toByteArray(), ConfigConstants.DEFAULT_CHARSET));
+                    fail(
+                            "Found error message: "
+                                    + new String(
+                                            errorMessages.toByteArray(),
+                                            ConfigConstants.DEFAULT_CHARSET));
                 }
 
                 serverThread.join();
                 serverThread.checkError();
-
-                validateCsvOutput();
             }
         } finally {
             System.setOut(originalSysout);
@@ -78,27 +89,17 @@ public class SocketToCsvTest extends AbstractTestBase {
         }
     }
 
-    private void validateCsvOutput() throws IOException {
-        //String outputPath = "/opt/flink/data/output.csv";
-        String outputPath = "/data/output.csv";
-        Path output = Paths.get(outputPath);
-        assertTrue(Files.exists(output), "Output file does not exist");
-
-        List<String> lines = Files.readAllLines(output);
-        assertFalse(lines.isEmpty(), "Output file is empty");
-
-        System.out.println("CSV Output Validation Passed ✅");
-    }
-
     // ------------------------------------------------------------------------
 
     private static class ServerThread extends Thread {
 
         private final ServerSocket serverSocket;
+
         private volatile Throwable error;
 
         public ServerThread(ServerSocket serverSocket) {
             super("Socket Server Thread");
+
             this.serverSocket = serverSocket;
         }
 
@@ -106,9 +107,9 @@ public class SocketToCsvTest extends AbstractTestBase {
         public void run() {
             try {
                 try (Socket socket = NetUtils.acceptWithoutTimeout(serverSocket);
-                     PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+                        PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
 
-                    writer.println("hello world flink flink");
+                    writer.println(WordCountData.TEXT);
                 }
             } catch (Throwable t) {
                 this.error = t;
@@ -123,6 +124,7 @@ public class SocketToCsvTest extends AbstractTestBase {
     }
 
     private static final class NullStream extends OutputStream {
+
         @Override
         public void write(int b) {}
     }

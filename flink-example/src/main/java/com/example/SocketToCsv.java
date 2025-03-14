@@ -35,7 +35,7 @@ public class SocketToCsv {
         execSocket(hostname, port, outputPath);
     }
 
-    private static void execSocket(String hostname, int port, String outputPath) throws Exception {
+    public static void execSocket(String hostname, int port, String outputPath) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         DataStream<String> textStream = env.socketTextStream(hostname, port, "\n");

@@ -9,8 +9,8 @@ import com.example.domain.Person;
 
 public class PersonMapper {
     public static void toCustomParserFileStream(String outputPath, DataStream<String> textStream, FileSink<String> sink) {
-        DataStream<Tuple4<Integer, String, String, Integer>> dataStream = textStream
-            .map(new PersonParser())
+        DataStream<Tuple4<String, String, String, Integer>> dataStream = textStream
+            .map(new TransactionParser())
             .filter(tuple -> tuple != null);
 
         dataStream.map(tuple -> tuple.f0 + "," + tuple.f1 + "," + tuple.f2 + "," + tuple.f3)
