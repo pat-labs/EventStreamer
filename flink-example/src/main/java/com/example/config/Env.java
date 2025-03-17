@@ -1,17 +1,19 @@
 package com.example.config;
 
-import java.time.Duration;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Env {
     private final Dotenv dotenv;
-    public final Duration boundedOutOfOrderness;
-    public final Duration tumblingWindowSize;
+    public final String inputPath;
+    public final String outPath;
+    public final String socketHostname;
+    public final int socketPort;
 
     public Env() {
         dotenv = Dotenv.load();
-        boundedOutOfOrderness = Duration.ofSeconds(Integer.parseInt(dotenv.get("BOUNDED_OUT_OF_ORDERNESS", "6")));
-        tumblingWindowSize = Duration.ofSeconds(Integer.parseInt(dotenv.get("TUMBLING_WINDOW_SIZE", "5")));
+        inputPath = dotenv.get("INPUT_PATH", "/data");
+        outPath = dotenv.get("OTUPATH", "/data/output");
+        socketHostname = dotenv.get("SOCKET_HOSTNAME", "localhost");
+        socketPort = Integer.parseInt(dotenv.get("SOCKET_PORT", "9000"));
     }
 }

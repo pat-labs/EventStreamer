@@ -6,12 +6,15 @@ import org.apache.flink.table.api.FormatDescriptor;
 import org.apache.flink.table.api.TableDescriptor;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableResult;
+
+import com.example.config.Bootstrap;
+
 import org.apache.flink.table.api.*;
 
 public class CsvProcessorTable {
     public static void main(String[] args) throws Exception {
-        String outputPath = "/opt/flink/data/output.csv";
-        execTableEnv(outputPath);
+        Bootstrap bootstrap = new Bootstrap();
+        execTableEnv(bootstrap.outputPath);
     }
 
     private static void execTableEnv(String outputPath) throws Exception{
@@ -40,7 +43,7 @@ public class CsvProcessorTable {
 
         tEnv.createTemporaryTable("CsvSinkTable", TableDescriptor.forConnector("filesystem")
                 .schema(personSchema)
-                .option("path", outputPath)
+                .option("path", outputPath + "output.csv")
                 .format(FormatDescriptor.forFormat("csv")
                         .option("field-delimiter", "-")
                         .option("write-mode", "overwrite")

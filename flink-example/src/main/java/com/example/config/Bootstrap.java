@@ -4,19 +4,12 @@ import org.apache.flink.configuration.MemorySize;
 
 import java.time.Duration;
 
-//PRO
-//Separación de la configuración del código
-//Integración con Docker y Kubernetes
-//Estandarización de la configuración
-//Flexibilidad en la configuracion de recursos
-//Despliegue distintos entornos
-//CONTRA
-//Posible complejidad en entornos complejos
-//Necesidad de reiniciar la aplicación
-//Necesidad de documentación clara
-//Posible complejidad de rastreo de cambios
 
 public class Bootstrap {
+    public final String inputPath;
+    public final String outputPath;
+    public final String socketHostname;
+    public final int socketPort;
     public final Duration rolloverInterval;
     public final Duration inactivityInterval;
     public final MemorySize maxPartSize;
@@ -25,10 +18,15 @@ public class Bootstrap {
 
     public Bootstrap() {
         Env env = new Env();
-        rolloverInterval = Constants.ROLLOVER_INTERVAL;
-        inactivityInterval = Constants.INACTIVITY_INTERVAL;
-        maxPartSize = Constants.MAX_PART_SIZE;
-        boundedOutOfOrderness = env.boundedOutOfOrderness;
-        tumblingWindowSize = env.tumblingWindowSize;
+        inputPath = env.inputPath;
+        outputPath = env.outPath;
+        socketHostname = env.socketHostname;
+        socketPort = env.socketPort;
+
+        boundedOutOfOrderness = Duration.ofSeconds(Constants.boundedOutOfOrderness);
+        tumblingWindowSize = Duration.ofSeconds(Constants.tumblingWindowSize);
+        rolloverInterval = Duration.ofSeconds(Constants.rolloverInterval);
+        maxPartSize = MemorySize.ofMebiBytes(Constants.maxPartSize);
+        inactivityInterval = Duration.ofSeconds(Constants.inactivityInterval);
     }
 }

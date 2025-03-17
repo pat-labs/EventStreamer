@@ -5,7 +5,6 @@ import java.time.Duration;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringEncoder;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.MemorySize;
 import org.apache.flink.connector.file.sink.FileSink;
 import org.apache.flink.core.fs.Path;
@@ -16,40 +15,20 @@ import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.util.Collector;
 
+import com.example.config.Bootstrap;
+
 public class SocketToCsv {
     public static void main(String[] args) throws Exception {
-        final String hostname;
-        final int port;
+        Bootstrap bootstrap = new Bootstrap();
 
-        try {
-            final ParameterTool params = ParameterTool.fromArgs(args);
-            hostname = params.has("hostname") ? params.get("hostname") : "localhost";
-            port = params.getInt("port");
-        } catch (Exception e) {
-            System.err.println("Usage: --hostname <hostname> --port <port>");
-            return;
-        }
-
-        String outputPath = "/opt/flink/data/output.csv";
-
-        execSocket(hostname, port, outputPath);
-    }
-
-    public static void execSocket(String hostname, int port, String outputPath) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        
+        DataStream<String> textStream = env.socketTextStream(bootstrap.socketHostname, bootstrap.socketPort, "\n");
 
-        DataStream<String> textStream = env.socketTextStream(hostname, port, "\n");
-
-        KeyedStream<Tuple2<String, Long>, String> keyedStream = textStream
-            .flatMap(new Tokenizer())
-            .keyBy(value -> value.f0);
-
-        DataStream<Tuple2<String, Long>> windowCounts = keyedStream
-            .window(TumblingProcessingTimeWindows.of(Duration.ofSeconds(5)))
-            .reduce((a, b) -> Tuple2.of(a.f0, a.f1 + b.f1));
+        DataStream<Tuple2<String, Long>> windowCounts = wordCountStream(textStream);
 
         FileSink<String> sink = FileSink
-            .forRowFormat(new Path(outputPath), new SimpleStringEncoder<String>("UTF-8"))
+            .forRowFormat(new Path(bootstrap.outputPath + "/output.csv"), new SimpleStringEncoder<String>("UTF-8"))
             .withRollingPolicy(
                 DefaultRollingPolicy.builder()
                     .withRolloverInterval(Duration.ofMinutes(5))
@@ -63,6 +42,16 @@ public class SocketToCsv {
             .sinkTo(sink);
 
         env.execute("Socket to CSV Word Count");
+    }
+
+    public static DataStream<Tuple2<String, Long>> wordCountStream(DataStream<String> input) {
+        KeyedStream<Tuple2<String, Long>, String> keyedStream = input
+            .flatMap(new Tokenizer())
+            .keyBy(value -> value.f0);
+
+        return keyedStream
+            .window(TumblingProcessingTimeWindows.of(Duration.ofSeconds(5)))
+            .reduce((a, b) -> Tuple2.of(a.f0, a.f1 + b.f1));
     }
 
     public static class Tokenizer implements FlatMapFunction<String, Tuple2<String, Long>> {

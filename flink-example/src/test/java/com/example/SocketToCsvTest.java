@@ -1,12 +1,13 @@
 package com.example;
 
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.ConfigConstants;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.test.util.AbstractTestBase;
 import org.apache.flink.util.NetUtils;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,40 +17,25 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Arrays;
-import java.util.Collection;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.junit.Assert.fail;
 
-/** Tests for {@link SocketWindowWordCount}. */
-@RunWith(Parameterized.class)
-public class SocketToCsvCase extends AbstractTestBaseJUnit4 {
-
-    @Parameterized.Parameter public boolean asyncState;
-
-    @Parameterized.Parameters
-    public static Collection<Boolean> setup() {
-        return Arrays.asList(false, true);
-    }
-
+public class SocketToCsvTest extends AbstractTestBase {
     @Test
     public void testJavaProgram() throws Exception {
+        System.out.println("RUNNING...");
         InetAddress localhost = InetAddress.getByName("localhost");
 
-        // suppress sysout messages from this example
         final PrintStream originalSysout = System.out;
         final PrintStream originalSyserr = System.err;
-
         final ByteArrayOutputStream errorMessages = new ByteArrayOutputStream();
-
-        System.setOut(new PrintStream(new NullStream()));
-        System.setErr(new PrintStream(errorMessages));
+        //System.setOut(new PrintStream(new NullStream()));
+        //System.setErr(new PrintStream(errorMessages));
 
         try {
             try (ServerSocket server = new ServerSocket(0, 10, localhost)) {
@@ -61,16 +47,14 @@ public class SocketToCsvCase extends AbstractTestBaseJUnit4 {
                 final int serverPort = server.getLocalPort();
                 System.out.println("Server listening on port " + serverPort);
 
-                // if (asyncState) {
-                //     SocketWindowWordCount.main(
-                //             new String[] {"--port", String.valueOf(serverPort), "--async-state"});
-                // } else {
-                //     SocketWindowWordCount.main(new String[] {"--port", String.valueOf(serverPort)});
-                // }
+                CollectSink.values.clear();
 
-                String outputPath = "/data/output.csv";
+                final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-                SocketToCsv.execSocket("localhost", serverPort, outputPath);
+                DataStream<String> dataStream = env.socketTextStream("localhost", serverPort, "\n");
+                dataStream.print();
+                DataStream<Tuple2<String, Long>> resultStream = SocketToCsv.wordCountStream(dataStream);
+                resultStream.addSink(new CollectSink());
 
                 if (errorMessages.size() != 0) {
                     fail(
@@ -80,8 +64,15 @@ public class SocketToCsvCase extends AbstractTestBaseJUnit4 {
                                             ConfigConstants.DEFAULT_CHARSET));
                 }
 
+                env.execute("Socket Stream Word Count Test");
                 serverThread.join();
                 serverThread.checkError();
+
+                List<Tuple2<String, Long>> results = CollectSink.values;
+                for (Tuple2<String, Long> tuple : CollectSink.values) {
+                    System.out.println("Checking tuple: " + tuple);
+                }
+                assertTrue(results.contains(new Tuple2<>("patrick",1L)));
             }
         } finally {
             System.setOut(originalSysout);
@@ -92,14 +83,11 @@ public class SocketToCsvCase extends AbstractTestBaseJUnit4 {
     // ------------------------------------------------------------------------
 
     private static class ServerThread extends Thread {
-
         private final ServerSocket serverSocket;
-
         private volatile Throwable error;
 
         public ServerThread(ServerSocket serverSocket) {
             super("Socket Server Thread");
-
             this.serverSocket = serverSocket;
         }
 
@@ -108,8 +96,9 @@ public class SocketToCsvCase extends AbstractTestBaseJUnit4 {
             try {
                 try (Socket socket = NetUtils.acceptWithoutTimeout(serverSocket);
                         PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
-
-                    writer.println(WordCountData.TEXT);
+                        
+                        System.out.println("Client connected! Sending data...");
+                        writer.println("patrick");
                 }
             } catch (Throwable t) {
                 this.error = t;
@@ -124,9 +113,18 @@ public class SocketToCsvCase extends AbstractTestBaseJUnit4 {
     }
 
     private static final class NullStream extends OutputStream {
-
         @Override
         public void write(int b) {}
+    }
+
+    private static class CollectSink implements SinkFunction<Tuple2<String, Long>> {
+        public static final List<Tuple2<String, Long>> values =
+                Collections.synchronizedList(new ArrayList<>());
+    
+        @Override
+        public void invoke(Tuple2<String, Long> value, Context context) {
+            values.add(value);
+        }
     }
 }
 

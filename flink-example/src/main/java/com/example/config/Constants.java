@@ -1,10 +1,9 @@
 package com.example.config;
-import org.apache.flink.configuration.MemorySize;
-
-import java.time.Duration;
 
 public class Constants {
-    public static final Duration ROLLOVER_INTERVAL = Duration.ofSeconds(3);
-    public static final MemorySize MAX_PART_SIZE = MemorySize.ofMebiBytes(1024);
-    public static final Duration INACTIVITY_INTERVAL = Duration.ofSeconds(10);
+    public static final int boundedOutOfOrderness = 6;
+    public static final int tumblingWindowSize = 5;
+    public static final int rolloverInterval = 3;
+    public static final int maxPartSize = 1024;
+    public static final int inactivityInterval = 10;
 }
