@@ -29,4 +29,17 @@ public class Bootstrap {
         maxPartSize = MemorySize.ofMebiBytes(Constants.maxPartSize);
         inactivityInterval = Duration.ofSeconds(Constants.inactivityInterval);
     }
+    public Bootstrap(String path){
+     FlinkProperties flinkProperties=new FlinkProperties(path);
+     inputPath=flinkProperties.inputPath;
+     outputPath=flinkProperties.outputPath;
+     socketHostname=flinkProperties.socketHostname;
+     socketPort=flinkProperties.socketPort;
+
+     boundedOutOfOrderness=flinkProperties.boundedOutOfOrderness;
+     tumblingWindowSize=flinkProperties.tumblingWindowSize;
+     rolloverInterval=flinkProperties.rolloverInterval;
+     maxPartSize=flinkProperties.maxPartSize;
+     inactivityInterval=flinkProperties.inactivityInterval;
+    }
 }
