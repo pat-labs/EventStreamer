@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.test.junit5.MiniClusterExtension;
 
 import com.example.config.Bootstrap;
-import com.example.utils.TransactionParser;
+import com.example.mapper.TransactionMapper;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -52,12 +52,11 @@ public class CsvProcessorStreamTest {
         DataStream<String> data = env.fromData(input);
 
         DataStream<Tuple4<String, String, String, Integer>> dataStream = data
-                .map(new TransactionParser())
+                .map(new TransactionMapper())
                 .filter(tuple -> tuple != null);
 
         DataStream<Tuple4<String, String, String, Double>> resultStream =
             CsvProcessorStream.averageStream(dataStream, bootstrap);
-        resultStream.print();
 
         resultStream.addSink(new CollectSink());
         env.execute();

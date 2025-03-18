@@ -13,6 +13,8 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.triggers.CountTrigger;
+import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger;
 import org.apache.flink.util.Collector;
 
 import com.example.config.Bootstrap;
@@ -50,7 +52,9 @@ public class SocketToCsv {
             .keyBy(value -> value.f0);
 
         return keyedStream
-            .window(TumblingProcessingTimeWindows.of(Duration.ofSeconds(5)))
+            .window(TumblingProcessingTimeWindows.of(Duration.ofSeconds(2)))
+            // Trigger on 2 events
+            .trigger(PurgingTrigger.of(CountTrigger.of(2)))
             .reduce((a, b) -> Tuple2.of(a.f0, a.f1 + b.f1));
     }
 

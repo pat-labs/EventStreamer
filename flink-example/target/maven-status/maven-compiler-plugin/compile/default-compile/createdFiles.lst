@@ -1,13 +1,11 @@
+com/example/mapper/TransactionMapper.class
 com/example/CsvProcessorStream$2.class
 com/example/config/Env.class
-com/example/utils/PersonMapper.class
-com/example/config/Bootstrap.class
 com/example/CsvProcessorStream$AvgProcessWindowFunction.class
 com/example/CsvProcessorTable.class
 com/example/CsvProcessorStream$1.class
 com/example/config/Constants.class
-com/example/utils/TransactionParser.class
-com/example/domain/Person.class
+com/example/config/Bootstrap.class
 com/example/CsvProcessorStream.class
 com/example/SocketToCsv$Tokenizer.class
 com/example/SocketToCsv.class

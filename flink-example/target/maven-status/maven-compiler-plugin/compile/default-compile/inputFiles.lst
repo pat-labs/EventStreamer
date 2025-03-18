@@ -1,9 +1,7 @@
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/CsvProcessorStream.java
-/home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/domain/Person.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/CsvProcessorTable.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/SocketToCsv.java
+/home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/mapper/TransactionMapper.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/Env.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/Constants.java
-/home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/utils/TransactionParser.java
-/home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/utils/PersonMapper.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/Bootstrap.java

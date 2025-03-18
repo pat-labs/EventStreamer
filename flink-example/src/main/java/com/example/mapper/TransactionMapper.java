@@ -1,11 +1,11 @@
-package com.example.utils;
+package com.example.mapper;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple4;
 
 import java.util.Optional;
 
-public class TransactionParser implements MapFunction<String, Tuple4<String, String, String, Integer>> {
+public class TransactionMapper implements MapFunction<String, Tuple4<String, String, String, Integer>> {
 
     @Override
     public Tuple4<String, String, String, Integer> map(String value) {

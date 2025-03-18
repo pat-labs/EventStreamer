@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.junit.jupiter.api.Test;
 
-import com.example.utils.TransactionParser;
+import com.example.mapper.TransactionMapper;
 
-public class TransactionParserTest {
+public class TransactionMapperTest {
     @Test
     public void testValidInput() throws Exception {
-        TransactionParser parser = new TransactionParser();
+        TransactionMapper parser = new TransactionMapper();
         Tuple4<String, String, String, Integer> result = parser.map("1652088888997,1,1,30");
         assertNotNull(result);
         assertEquals("1652088888997", result.f0);

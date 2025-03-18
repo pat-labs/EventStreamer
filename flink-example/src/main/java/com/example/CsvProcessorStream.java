@@ -1,28 +1,19 @@
 package com.example;
 
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringEncoder;
-import org.apache.flink.api.common.state.ListState;
-import org.apache.flink.api.common.state.ListStateDescriptor;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.apache.flink.api.java.utils.ParameterTool;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.file.sink.FileSink;
 import org.apache.flink.connector.file.src.FileSource;
 import org.apache.flink.connector.file.src.reader.TextLineInputFormat;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
@@ -31,7 +22,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 import com.example.config.Bootstrap;
-import com.example.utils.TransactionParser;
+import com.example.mapper.TransactionMapper;
 
 public class CsvProcessorStream {
     public static void main(String[] args) throws Exception {
@@ -49,7 +40,7 @@ public class CsvProcessorStream {
         );
 
         DataStream<Tuple4<String, String, String, Integer>> dataStream = data
-                .map(new TransactionParser())
+                .map(new TransactionMapper())
                 .filter(tuple -> tuple != null);
 
         DataStream<Tuple4<String, String, String, Integer>> orderStream = sortStream(dataStream, bootstrap);
@@ -83,8 +74,8 @@ public class CsvProcessorStream {
             String personId = "";
 
             for (Tuple4<String, String, String, Integer> event : elements) {
-                System.out.println("Processing window: id:" + event.f1 +
-                        " amount: " + event.f3 + " ts: " + context.currentWatermark());
+                // System.out.println("Processing window: id:" + event.f1 +
+                //         " amount: " + event.f3 + " ts: " + context.currentWatermark());
 
                 sum += event.f3;
                 count++;
