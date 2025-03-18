@@ -22,11 +22,13 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 import com.example.config.Bootstrap;
+import com.example.config.EnvLoader;
 import com.example.mapper.TransactionMapper;
 
 public class CsvProcessorStream {
     public static void main(String[] args) throws Exception {
-        Bootstrap bootstrap = new Bootstrap();
+        EnvLoader envLoader = new EnvLoader();
+        Bootstrap bootstrap = envLoader.buildBootstrap();
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 

@@ -18,10 +18,12 @@ import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger;
 import org.apache.flink.util.Collector;
 
 import com.example.config.Bootstrap;
+import com.example.config.PropertiesLoader;
 
 public class SocketToCsv {
     public static void main(String[] args) throws Exception {
-        Bootstrap bootstrap = new Bootstrap();
+        PropertiesLoader propertiesLoader = new PropertiesLoader("/opt/flink/data/app.properties");
+        Bootstrap bootstrap = propertiesLoader.buildBootstrap();
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         
@@ -54,7 +56,7 @@ public class SocketToCsv {
         return keyedStream
             .window(TumblingProcessingTimeWindows.of(Duration.ofSeconds(2)))
             // Trigger on 2 events
-            .trigger(PurgingTrigger.of(CountTrigger.of(2)))
+            //.trigger(PurgingTrigger.of(CountTrigger.of(2)))
             .reduce((a, b) -> Tuple2.of(a.f0, a.f1 + b.f1));
     }
 

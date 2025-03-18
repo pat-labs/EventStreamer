@@ -8,9 +8,10 @@ import org.apache.flink.test.util.AbstractTestBase;
 import org.apache.flink.util.NetUtils;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
+import com.example.config.Bootstrap;
+import com.example.config.EnvLoader;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -26,12 +27,14 @@ import java.util.Collections;
 public class SocketToCsvTest extends AbstractTestBase {
     @Test
     public void testJavaProgram() throws Exception {
-        String hostname = "localhost";
-        InetAddress localhost = InetAddress.getByName(hostname);
+        EnvLoader envLoader = new EnvLoader();
+        Bootstrap bootstrap = envLoader.buildBootstrap();
+
+        InetAddress localhost = InetAddress.getByName(bootstrap.socketHostname);
 
         final PrintStream originalSysout = System.out;
         final PrintStream originalSyserr = System.err;
-        final ByteArrayOutputStream errorMessages = new ByteArrayOutputStream();
+        //final ByteArrayOutputStream errorMessages = new ByteArrayOutputStream();
         //System.setOut(new PrintStream(new NullStream()));
         //System.setErr(new PrintStream(errorMessages));
 
@@ -48,7 +51,7 @@ public class SocketToCsvTest extends AbstractTestBase {
 
             final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-            DataStream<String> dataStream = env.socketTextStream(hostname, serverPort, "\n");
+            DataStream<String> dataStream = env.socketTextStream(bootstrap.socketHostname, serverPort, "\n");
             // dataStream.map(value -> { 
             //     System.out.println("Raw in Flink: " + value);
             //     return value;
@@ -108,11 +111,6 @@ public class SocketToCsvTest extends AbstractTestBase {
                 throw new IOException("Error in server thread: " + error.getMessage(), error);
             }
         }
-    }
-
-    private static final class NullStream extends OutputStream {
-        @Override
-        public void write(int b) {}
     }
 
     private static class CollectSink implements SinkFunction<Tuple2<String, Long>> {

@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.test.junit5.MiniClusterExtension;
 
 import com.example.config.Bootstrap;
+import com.example.config.EnvLoader;
 import com.example.mapper.TransactionMapper;
 
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,8 @@ public class CsvProcessorStreamTest {
 
     @Test
     void testCsvProcessorStream() throws Exception {
-        Bootstrap bootstrap = new Bootstrap();
+        EnvLoader envLoader = new EnvLoader();
+        Bootstrap bootstrap = envLoader.buildBootstrap();
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();  
         env.setParallelism(1);

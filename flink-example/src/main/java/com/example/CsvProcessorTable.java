@@ -1,19 +1,14 @@
 package com.example;
 
-import org.apache.flink.table.api.DataTypes;
-import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.FormatDescriptor;
-import org.apache.flink.table.api.TableDescriptor;
-import org.apache.flink.table.api.TableEnvironment;
-import org.apache.flink.table.api.TableResult;
-
 import com.example.config.Bootstrap;
+import com.example.config.EnvLoader;
 
 import org.apache.flink.table.api.*;
 
 public class CsvProcessorTable {
     public static void main(String[] args) throws Exception {
-        Bootstrap bootstrap = new Bootstrap();
+        EnvLoader envLoader = new EnvLoader();
+        Bootstrap bootstrap = envLoader.buildBootstrap();
         execTableEnv(bootstrap.outputPath);
     }
 
