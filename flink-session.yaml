@@ -5,6 +5,8 @@ services:
     ports:
       - "8081:8081"
     command: jobmanager
+    env_file:
+     - ./.env
     environment:
       - |
         FLINK_PROPERTIES=
@@ -23,6 +25,8 @@ services:
       - jobmanager
     command: taskmanager
     scale: 2
+    env_file:
+     - ./.env
     environment:
       - |
         FLINK_PROPERTIES=

@@ -3,6 +3,7 @@
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/SocketToCsv.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/EnvLoader.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/mapper/TransactionMapper.java
+/home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/SMBPropertiesLoader.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/Constants.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/Bootstrap.java
 /home/patrick/Documents/projects/flink/flink-example/src/main/java/com/example/config/PropertiesLoader.java

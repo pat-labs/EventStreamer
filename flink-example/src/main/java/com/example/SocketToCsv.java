@@ -13,17 +13,15 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
-import org.apache.flink.streaming.api.windowing.triggers.CountTrigger;
-import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger;
 import org.apache.flink.util.Collector;
 
 import com.example.config.Bootstrap;
-import com.example.config.PropertiesLoader;
+import com.example.config.EnvLoader;
 
 public class SocketToCsv {
     public static void main(String[] args) throws Exception {
-        PropertiesLoader propertiesLoader = new PropertiesLoader("/opt/flink/data/app.properties");
-        Bootstrap bootstrap = propertiesLoader.buildBootstrap();
+        EnvLoader envLoader = new EnvLoader();
+        Bootstrap bootstrap = envLoader.buildBootstrap();
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         

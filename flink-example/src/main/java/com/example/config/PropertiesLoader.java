@@ -3,34 +3,37 @@ package com.example.config;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.function.Predicate;
 
 public class PropertiesLoader {
-    private final Properties properties;
     public final String appPath;
-    public final boolean isProdcution;
+    public final boolean isProduction;
     public final String inputPath;
     public final String outPath;
     public final String socketHostname;
     public final int socketPort;
 
-    public PropertiesLoader(String propertiesFilePath) {
-        properties = new Properties();
+    public static PropertiesLoader fromFile() {
+        Properties properties = new Properties();
+        String propertiesFilePath = "././app.properties";
         try (FileInputStream input = new FileInputStream(propertiesFilePath)) {
             properties.load(input);
         } catch (IOException e) {
             throw new RuntimeException("Error loading properties file: " + propertiesFilePath, e);
         }
+        return new PropertiesLoader(properties);
+    }
 
-        appPath = properties.getProperty("app.path", "flink-example/src");
-        inputPath = properties.getProperty("app.input.path", "/data");
-        outPath = properties.getProperty("app.output.path", "/data/output");
-        socketHostname = properties.getProperty("app.socket.hostname", "localhost");
+    public PropertiesLoader(Properties properties) {
+        this.appPath = properties.getProperty("app.path", "flink-example/src");
+        this.inputPath = properties.getProperty("app.input.path", "/data");
+        this.outPath = properties.getProperty("app.output.path", "/data/output");
+        this.socketHostname = properties.getProperty("app.socket.hostname", "localhost");
 
+        // Conversión de string a boolean
         String isProductionStr = properties.getProperty("app.is_production", "0");
-        Predicate<String> isProduction = s -> "1".equals(s);
-        isProdcution = isProduction.test(isProductionStr);
-        
+        this.isProduction = "1".equals(isProductionStr);
+
+        // Conversión de puerto a entero con manejo de errores
         String socketPortStr = properties.getProperty("app.socket.port", "9000");
         int port;
         try {
@@ -38,14 +41,13 @@ public class PropertiesLoader {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid socket port: " + socketPortStr, e);
         }
-        socketPort = port;
+        this.socketPort = port;
     }
 
     public Bootstrap buildBootstrap() {
-        return new Bootstrap.Builder(isProdcution, appPath, inputPath, outPath)
+        return new Bootstrap.Builder(isProduction, appPath, inputPath, outPath)
                 .socketHostname(socketHostname)
                 .socketPort(socketPort)
                 .build();
     }
 }
-

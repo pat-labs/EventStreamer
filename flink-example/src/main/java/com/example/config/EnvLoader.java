@@ -13,7 +13,11 @@ public class EnvLoader {
     public final int socketPort;
 
     public EnvLoader() {
-        dotenv = Dotenv.load();
+        dotenv = Dotenv.configure()
+        .directory("././.env")
+        .ignoreIfMalformed()
+        .ignoreIfMissing()
+        .load();
         appPath = dotenv.get("APP_PATH", "flink-example/src");
         inputPath = dotenv.get("INPUT_PATH", "/data");
         outPath = dotenv.get("OTUPATH", "/data/output");

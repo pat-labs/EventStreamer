@@ -40,7 +40,7 @@
               </artifactSet>
               <transformers>
                 <transformer>
-                  <mainClass>com.example.CsvProcessorStream</mainClass>
+                  <mainClass>com.example.SocketToCsv</mainClass>
                 </transformer>
               </transformers>
             </configuration>
