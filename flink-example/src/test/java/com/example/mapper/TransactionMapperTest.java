@@ -1,4 +1,4 @@
-package com.example;
+package com.example.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

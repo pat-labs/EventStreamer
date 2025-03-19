@@ -8,39 +8,29 @@ public class EnvLoader {
     public final String appPath;
     public final boolean isProdcution;
     public final String inputPath;
-    public final String outPath;
-    public final String socketHostname;
-    public final int socketPort;
+    public final String outputPath;
+    public final int numberTaskManagers;
+    public final int parallelism;
 
-    public EnvLoader() {
+    public EnvLoader(String envFilePath) throws NumberFormatException{
         dotenv = Dotenv.configure()
-        .directory("././.env")
+        .directory(envFilePath)
         .ignoreIfMalformed()
         .ignoreIfMissing()
         .load();
         appPath = dotenv.get("APP_PATH", "flink-example/src");
         inputPath = dotenv.get("INPUT_PATH", "/data");
-        outPath = dotenv.get("OTUPATH", "/data/output");
-        socketHostname = dotenv.get("SOCKET_HOSTNAME", "localhost");
+        outputPath = dotenv.get("OUTPUT_PATH", "/data/output");
 
         String isProductionStr = dotenv.get("IS_PRODUCTION", "0");
         Predicate<String> isProduction = s -> "1".equals(s);
         isProdcution = isProduction.test(isProductionStr);
 
-        String socketPortStr = dotenv.get("SOCKET_PORT", "9000");
-        int port;
-        try {
-            port = Integer.parseInt(socketPortStr);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid socket port: " + socketPortStr, e);
-        }
-        socketPort = port;
+        numberTaskManagers = Integer.parseInt(dotenv.get("NUMBER_TASK_MANAGERS", "2"));
+        parallelism = Integer.parseInt(dotenv.get("PARALLELISM", "1"));
     }
 
     public Bootstrap buildBootstrap(){
-        return new Bootstrap.Builder(isProdcution, appPath, inputPath, outPath)
-                .socketHostname(socketHostname)
-                .socketPort(socketPort)
-                .build();
+        return new Bootstrap.Builder(isProdcution, appPath, inputPath, outputPath).parallelism(parallelism).build();
     }
 }

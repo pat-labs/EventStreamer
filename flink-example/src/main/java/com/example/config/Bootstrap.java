@@ -12,8 +12,9 @@ public class Bootstrap {
     public final String inputPath;
     public final String outputPath;
     // Optional
-    public final String socketHostname;
-    public final int socketPort;
+    public final int numberSlotsPerTaskManager;
+    public final int numberTaskManagers;
+    public final int parallelism;
     public final Duration rolloverInterval;
     public final Duration inactivityInterval;
     public final MemorySize maxPartSize;
@@ -25,13 +26,30 @@ public class Bootstrap {
         this.appPath = builder.appPath;
         this.inputPath = builder.inputPath;
         this.outputPath = builder.outputPath;
-        this.socketHostname = builder.socketHostname;
-        this.socketPort = builder.socketPort;
+
+        this.numberSlotsPerTaskManager = builder.numberSlotsPerTaskManager;
+        this.numberTaskManagers = builder.numberTaskManagers;
+        this.parallelism = builder.parallelism;
         this.rolloverInterval = Duration.ofSeconds(builder.rolloverIntervalSeconds);
         this.inactivityInterval = Duration.ofSeconds(builder.inactivityIntervalSeconds);
         this.maxPartSize = MemorySize.ofMebiBytes(builder.maxPartSizeMebiBytes);
         this.boundedOutOfOrderness = Duration.ofSeconds(builder.boundedOutOfOrdernessSeconds);
         this.tumblingWindowSize = Duration.ofSeconds(builder.tumblingWindowSizeSeconds);
+    }
+
+    @Override
+    public String toString() {
+        return "Bootstrap{" +
+                "isProduction=" + isProduction +
+                ", appPath='" + appPath + '\'' +
+                ", inputPath='" + inputPath + '\'' +
+                ", outputPath='" + outputPath + '\'' +
+                ", rolloverInterval=" + rolloverInterval +
+                ", inactivityInterval=" + inactivityInterval +
+                ", maxPartSize=" + maxPartSize +
+                ", boundedOutOfOrderness=" + boundedOutOfOrderness +
+                ", tumblingWindowSize=" + tumblingWindowSize +
+                '}';
     }
 
     public static class Builder {
@@ -43,8 +61,9 @@ public class Bootstrap {
         private final String outputPath;
 
         // Optional
-        private String socketHostname = null;
-        private int socketPort = 0;
+        private int numberSlotsPerTaskManager = Constants.numberSlotsPerTaskManager;
+        private int numberTaskManagers = Constants.numberTaskManagers;
+        private int parallelism = Constants.parallelism;
         private long rolloverIntervalSeconds = Constants.rolloverInterval;
         private long inactivityIntervalSeconds = Constants.inactivityInterval;
         private long maxPartSizeMebiBytes = Constants.maxPartSize;
@@ -58,13 +77,18 @@ public class Bootstrap {
             this.outputPath = outputPath;
         }
 
-        public Builder socketHostname(String socketHostname) {
-            this.socketHostname = socketHostname;
+        public Builder numberSlotsPerTaskManager(int numberSlotsPerTaskManager) {
+            this.numberSlotsPerTaskManager = numberSlotsPerTaskManager;
             return this;
         }
 
-        public Builder socketPort(int socketPort) {
-            this.socketPort = socketPort;
+        public Builder numberTaskManagers(int numberTaskManagers) {
+            this.numberTaskManagers = numberTaskManagers;
+            return this;
+        }
+
+        public Builder parallelism(int parallelism) {
+            this.parallelism = parallelism;
             return this;
         }
 

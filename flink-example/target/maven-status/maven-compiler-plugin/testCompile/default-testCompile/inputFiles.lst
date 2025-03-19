@@ -1,0 +1,4 @@
+/home/patrick/Documents/projects/flink/flink-example/src/test/java/com/example/udf/AverageProcessTest.java
+/home/patrick/Documents/projects/flink/flink-example/src/test/java/com/example/udf/SortProcessTest.java
+/home/patrick/Documents/projects/flink/flink-example/src/test/java/com/example/mapper/TransactionMapperTest.java
+/home/patrick/Documents/projects/flink/flink-example/src/test/java/com/example/utils/CollectSink.java

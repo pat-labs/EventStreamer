@@ -7,7 +7,7 @@ services:
     command: >
       standalone-job --jars /opt/flink/usrlib/flink-example-1.0-SNAPSHOT.jar
     env_file:
-     - ./.env
+     - .env
     environment:
       - |
         FLINK_PROPERTIES=
@@ -25,7 +25,7 @@ services:
     command: taskmanager
     scale: 2
     env_file:
-     - ./.env
+     - .env
     environment:
       - |
         FLINK_PROPERTIES=

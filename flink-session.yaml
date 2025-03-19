@@ -6,7 +6,7 @@ services:
       - "8081:8081"
     command: jobmanager
     env_file:
-     - ./.env
+     - .env
     environment:
       - |
         FLINK_PROPERTIES=
@@ -26,7 +26,7 @@ services:
     command: taskmanager
     scale: 2
     env_file:
-     - ./.env
+     - .env
     environment:
       - |
         FLINK_PROPERTIES=
