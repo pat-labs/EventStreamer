@@ -1,30 +1,92 @@
+# README
+
 ## Flink 1.20 Example Project with Java 17
 
-This project demonstrates a basic Flink 1.20 application built with Java 17. It includes examples of data processing using Flink's DataStream API and provides instructions for running the application in both local Flink environments and Docker containers.
+This project demonstrates a basic Flink 1.20 application built with Java 17. It includes examples of data processing using Flink's DataStream API, specifically focusing on convertion from TXT to CSV data processing, windowing, and custom user-defined functions (UDFs). It provides instructions for running the application in both local Flink environments and Docker containers.
+
+## Use Case
+
+The job class `CsvProcessorStream` contains the main method `void process()` which receives the `Bootstrap` class as an argument. From this `Bootstrap` class, it retrieves the path to the data source (`input.txt`).
+
+The operations within the job are as follows:
+
+-   **File Reading:** Configures a data source (`FileSource`) to read text lines from a file specified by `inputFilePath`.
+-   **Data Processing:** Converts the text lines into tuples (`Tuple4`) using `TransactionMapper` and filters out null tuples.
+-   **Watermark Assignment:** Assigns watermarks and timestamps to the tuples to handle temporal disorder.
+-   **Average Calculation:** Calculates averages over the processed tuples using a tumbling window.
+-   **Result Writing:** Configures a sink (`FileSink`) to write the results to a CSV file in the path specified by `bootstrap.outputPath`, with file rotation policies.
+-   **Error Handling:** Captures and logs any errors that occur during execution.
+
+## Functions
+
+-   **`AvgProcessWindowFunction`:** Defines a window function that calculates the average of a numeric field in a set of events grouped by a specific key, emitting the result in a new tuple.
+-   **`SortProcessFunction`:** Defines a process function that configures a list state to store tuples, adds each tuple to the state, and registers a timer based on the event timestamp. When the timer is triggered, it sorts the stored tuples by the first field and emits them in order, then clears the state.
+
+## Project Startup
+
+The main class of the project is `Main.java`. From here, the project is started by calling the job. The configuration of the flink job is handled by the `Bootstrap.java` class, that uses the dotenv library to load the enviroment variables from the .env file. This class allows the user to configure the windows sizes, parallelism, and other flink configuration parameters.
+
+**Key Features:**
+
+* **CSV Data Processing:** Reads and processes CSV data from a file source.
+* **Windowing:** Demonstrates tumbling window operations for time-based data aggregation.
+* **Custom UDFs:** Includes custom UDFs for average calculation (`AvgProcessWindowFunction`) and sorting (`SortProcessFunction`).
+* **Environment Configuration:** Uses `.env` files and the `dotenv-java` library for flexible configuration.
+* **Docker Support:** Provides Docker Compose files for running Flink in both session and application modes.
+* **Unit Testing:** Includes comprehensive unit tests for mappers and UDFs.
 
 **Prerequisites:**
 
-* Java 17 or later
+* [Java 17 or later](https://adoptium.net/es/temurin/releases/?os=windows&version=17&package=jdk)
 * Maven
-* Docker (if running in Docker)
-* Flink 1.20 (if running locally)
+* [Docker (if running in Docker)](https://docs.docker.com/)
+* [Flink 1.20 (if running locally)](https://nightlies.apache.org/flink/flink-docs-release-1.20/docs/dev/configuration/overview/)
 
 **Project Structure:**
 
 ```
-flink-example/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/example/
-│   │   │       └── ... (Your Java source files)
-│   │   └── resources/
-│   │       └── log4j2.xml (Log4j 2 configuration)
-├── data/ (Input and output data directory)
-├── flink-session.yaml (Docker Compose for Flink session mode)
-├── flink-application.yaml (Docker Compose for Flink application mode)
-├── pom.xml (Maven project configuration)
-└── README.md
+Directory structure:
+└── pat-labs-eventstreamer/
+    ├── README.md
+    ├── flink-application.yaml
+    ├── flink-session.yaml
+    ├── .env .dev
+    ├── data/
+    │   └── input.txt
+    └── flink-example/
+        ├── dependency-reduced-pom.xml
+        ├── pom.xml
+        ├── src/
+            ├── main/
+            │   └── java/
+            │       └── com/
+            │           └── example/
+            │               ├── Main.java
+            │               ├── config/
+            │               │   ├── Bootstrap.java
+            │               │   ├── Constants.java
+            │               │   └── EnvLoader.java
+            │               ├── job/
+            │               │   └── CsvProcessorStream.java
+            │               ├── mapper/
+            │               │   └── TransactionMapper.java
+            │               └── udf/
+            │                   ├── AvgProcessWindowFunction.java
+            │                   └── SortProcessFunction.java
+            ├── resources/
+            │   └── log4j2.properties
+            └── test/
+                └── java/
+                    └── com/
+                        └── example/
+                            ├── mapper/
+                            │   └── TransactionMapperTest.java
+                            ├── udf/
+                            │   ├── AverageProcessTest.java
+                            │   └── SortProcessTest.java
+                            └── utils/
+                                └── CollectSink.java
+
 ```
 
 **Before Execution:**
@@ -50,10 +112,10 @@ flink-example/
 **1. Running Locally with Flink:**
 
 1.  **Start Flink:** Ensure your local Flink cluster is running.
-2.  **Execute the JAR:** Open a console and run the following command, replacing `/opt/flink/usrlib/` with the correct path to your Flink user library directory:
+2.  **Execute the JAR:** Open a console and run the following command, replacing `/flink-example/target/` with the correct path to your Flink user library directory:
 
     ```bash
-    flink run /opt/flink/usrlib/flink-example-1.0-SNAPSHOT.jar
+    flink run /flink-example/target/flink-example-1.0-SNAPSHOT.jar
     ```
 
 **2. Running with Docker:**
@@ -111,7 +173,7 @@ flink-example/
 * Apache Flink 1.20
 * Log4j 2
 * SLF4j
-* dotenv-java
+* [dotenv-java](https://github.com/cdimascio/dotenv-java)
 * JUnit 5
 
 **Notes:**
