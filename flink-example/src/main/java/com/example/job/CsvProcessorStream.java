@@ -38,7 +38,7 @@ public class CsvProcessorStream {
                 WatermarkStrategy.noWatermarks(), 
                 "source-transactions"
             );
-        
+            data.print();
             DataStream<Tuple4<String, String, String, Integer>> dataStream = data
                     .map(new TransactionMapper())
                     .filter(tuple -> tuple != null);

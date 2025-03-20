@@ -35,6 +35,7 @@ public class TransactionMapper implements MapFunction<String, Tuple4<String, Str
     }
 
     private Optional<Tuple4<String, String, String, Integer>> parseTransactionByIndex(String value, int firstIndex, int secondIndex, int thirdIndex, int fourthIndex) {
+        System.out.println("Value is: " + value);
         try {
             String createAt = value.substring(firstIndex, secondIndex).trim();
             String personId = value.substring(secondIndex, thirdIndex).trim();
