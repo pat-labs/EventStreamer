@@ -144,6 +144,13 @@ Directory structure:
     flink run /opt/flink/usrlib/flink-example-1.0-SNAPSHOT.jar
     ```
 
+3.  **Run the JAR with detail:**
+
+    ```bash
+    FLINK_LOG_DIR=./logs flink run /opt/flink/usrlib/flink-example-1.0-SNAPSHOT.jar
+    cat ./logs/flink-*.log
+    ```
+
 **2.2. Application Mode:**
 
 1.  **Start the Flink Application Cluster:**
