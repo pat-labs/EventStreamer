@@ -1,0 +1,23 @@
+# commands
+# docker build -f DockerfileSpotbugs -t spotbugs-checker .
+# docker run --rm -v $(pwd)/flink-job/target:/app/target spotbugs-checker /app/target
+
+FROM openjdk:21
+
+# Install necessary tools
+RUN apt-get update && apt-get install -y wget unzip findutils
+
+# Set SpotBugs version
+ENV SPOTBUGS_VERSION=4.8.3
+ENV SPOTBUGS_FOLDER=spotbugs-${SPOTBUGS_VERSION}
+ENV SPOTBUGS_EXEC=/app/${SPOTBUGS_FOLDER}/bin/spotbugs
+
+# Set working directory
+WORKDIR /app
+
+# Download and extract SpotBugs
+RUN wget https://github.com/spotbugs/spotbugs/releases/download/${SPOTBUGS_VERSION}/${SPOTBUGS_FOLDER}.zip
+RUN unzip ${SPOTBUGS_FOLDER}.zip
+
+# Define entrypoint to run SpotBugs
+ENTRYPOINT ["/app/spotbugs-4.8.3/bin/spotbugs"]

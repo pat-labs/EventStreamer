@@ -105,7 +105,7 @@ Directory structure:
     mvn clean package
     ```
 
-    * The JAR file will be located in the `target` directory (e.g., `target/flink-example-1.0-SNAPSHOT.jar`).
+    * The JAR file will be located in the `target` directory (e.g., `target/flink-job-1.0.0.jar`).
 
 **Running the Application:**
 
@@ -115,7 +115,7 @@ Directory structure:
 2.  **Execute the JAR:** Open a console and run the following command, replacing `/flink-example/target/` with the correct path to your Flink user library directory:
 
     ```bash
-    flink run /flink-example/target/flink-example-1.0-SNAPSHOT.jar
+    flink run /flink-example/target/flink-job-1.0.0.jar
     ```
 
 **2. Running with Docker:**
@@ -141,13 +141,13 @@ Directory structure:
 3.  **Run the JAR:**
 
     ```bash
-    flink run /opt/flink/usrlib/flink-example-1.0-SNAPSHOT.jar
+    flink run /opt/flink/usrlib/flink-job-1.0.0.jar
     ```
 
 3.  **Run the JAR with detail:**
 
     ```bash
-    FLINK_LOG_DIR=./logs flink run /opt/flink/usrlib/flink-example-1.0-SNAPSHOT.jar
+    FLINK_LOG_DIR=./logs flink run /opt/flink/usrlib/flink-job-1.0.0.jar
     cat ./logs/flink-*.log
     ```
 

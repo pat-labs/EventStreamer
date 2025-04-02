@@ -1,0 +1,15 @@
+# commands to run
+# docker build -f DockerfileOwasp -t owasp-dependency-check .
+# docker run --rm \
+#  -e JAVA_OPTS="--enable-native-access=ALL-UNNAMED" \
+#  -v $(pwd)/flink-job:/app \
+#  -v $(pwd)/report:/report \
+#  owasp-dependency-check --scan /app --format HTML --out /report
+
+FROM owasp/dependency-check
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Define entrypoint to run the scan
+ENTRYPOINT ["/usr/share/dependency-check/bin/dependency-check.sh"]

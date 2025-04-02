@@ -1,0 +1,24 @@
+# commands to run
+# docker build -f DockerfilePMD -t pmd-checker .
+# docker run -v {APP_PATH}:/app/my_java_project pmd-checker
+
+FROM eclipse-temurin:21
+
+# Install required tools
+RUN apt-get update && apt-get install -y wget unzip findutils
+
+# Set PMD version
+ENV PMD_VERSION=7.12.0
+ENV PMD_FILENAME=pmd-dist-${PMD_VERSION}-bin.zip
+ENV PMD_FOLDER=pmd-bin-${PMD_VERSION}
+ENV PMD_EXEC=/app/${PMD_FOLDER}/bin/pmd
+
+# Set working directory
+WORKDIR /app
+
+# Download and extract PMD
+RUN wget https://github.com/pmd/pmd/releases/download/pmd_releases%2F${PMD_VERSION}/${PMD_FILENAME}
+RUN unzip ${PMD_FILENAME}
+
+# Define entrypoint for PMD
+ENTRYPOINT ["/app/pmd-bin-7.12.0/bin/pmd", "check", "-d", "my_java_project/", "-R", "rulesets/java/quickstart.xml", "-f", "text"]

@@ -1,11 +1,11 @@
 services:
   jobmanager:
-    image: flink:1.20.1-scala_2.12-java17
+    image: flink:2.0.0-scala_2.12-java17
     container_name: jobmanager
     ports:
       - "8081:8081"
     command: >
-      standalone-job --jars /opt/flink/usrlib/flink-example-1.0-SNAPSHOT.jar
+      standalone-job --jars /opt/flink/usrlib/flink-job-1.0.0.jar
     env_file:
      - .env
     environment:
@@ -13,13 +13,13 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
     volumes:
-      - ./flink-example/target:/opt/flink/usrlib/
+      - ./flink-job/target:/opt/flink/usrlib/
       - ./data:/opt/flink/data/
     networks:
       - public
 
   taskmanager:
-    image: flink:1.20.1-scala_2.12-java17
+    image: flink:2.0.0-scala_2.12-java17
     depends_on:
       - jobmanager
     command: taskmanager

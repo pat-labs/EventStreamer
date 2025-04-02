@@ -1,0 +1,20 @@
+# commands to run
+# docker build -f DockerfileFormater -t google-java-formatter .
+# docker run -v {APP_PATH}:/app/my_java_project google-java-formatter
+
+FROM eclipse-temurin:21
+
+RUN apt-get update && apt-get install -y wget unzip findutils
+
+# Set the Google Java Format version
+ENV GOOGLE_JAVA_FORMAT_VERSION=1.26.0
+ENV GOOGLE_JAVA_FORMAT_JAR=google-java-format-${GOOGLE_JAVA_FORMAT_VERSION}-all-deps.jar
+
+# Set working directory
+WORKDIR /app
+
+# Download Google Java Format
+RUN wget https://github.com/google/google-java-format/releases/download/v${GOOGLE_JAVA_FORMAT_VERSION}/${GOOGLE_JAVA_FORMAT_JAR} -O ${GOOGLE_JAVA_FORMAT_JAR}
+
+# Define the command to run when the container starts
+CMD ["sh", "-c", "find my_java_project/ -name '*.java' -type f -print0 | xargs -0 java -jar /app/${GOOGLE_JAVA_FORMAT_JAR} --replace"]
