@@ -1,0 +1,55 @@
+# ----------------------------
+# StorageClass
+# ----------------------------
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+# ----------------------------
+# PersistentVolume
+# ----------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-persistent-volume
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 256Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - minikube
+---
+# ----------------------------
+# PersistentVolumeClaim
+# ----------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-persistent-volume-claim
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 256Mi
+  selector:
+    matchLabels:
+      type: local

@@ -1,0 +1,16 @@
+# docker run -v $(pwd)/flink-table-job:/app -v $(pwd)/job:/app/target java-app
+# Stage 1: Build the application with Maven
+FROM maven:4.0.0-jdk-17 AS builder
+
+# Set the working directory in the container
+WORKDIR /app
+
+VOLUME /app
+VOLUME /target
+
+# Copy the pom.xml and src directory to the container
+COPY pom.xml .
+COPY src ./src
+
+# Download dependencies and build the application
+RUN mvn clean package -DskipTests

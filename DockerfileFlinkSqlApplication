@@ -1,0 +1,10 @@
+FROM flink:2.0.0-scala_2.12-java17
+
+# Copiar archivos de configuración y librerías
+COPY job /opt/flink/usrlib/
+COPY data /opt/flink/data/
+
+VOLUME /opt/flink/usrlib
+VOLUME /opt/flink/data
+
+# CMD ["tail", "-f", "/dev/null"]

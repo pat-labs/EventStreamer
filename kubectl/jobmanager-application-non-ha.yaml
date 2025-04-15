@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flink-jobmanager
+spec:
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroup: 9999
+        runAsUser: 9999
+      containers:
+        - name: jobmanager
+          image: apache/flink:2.0.0-scala_2.12-java17
+          args:
+            [
+              "standalone-job",
+              "--jars",
+              "/opt/flink/usrlib/flink-table-job-1.0.0.jar",
+              "--job-classname",
+              "org.apache.flink.DataStreamJob",
+              "/opt/flink/data/job.sql"
+            ]
+          ports:
+            - containerPort: 6123
+              name: rpc
+            - containerPort: 6124
+              name: blob-server
+            - containerPort: 8081
+              name: webui
+          livenessProbe:
+            tcpSocket:
+              port: 6123
+            initialDelaySeconds: 30
+            periodSeconds: 60
+          volumeMounts:
+            - name: flink-config-volume
+              mountPath: /opt/flink/conf
+            - name: job-artifacts-volume
+              mountPath: /opt/flink/usrlib
+            - name: job-data-volume
+              mountPath: /opt/flink/data
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: flink-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+              - key: log4j-console.properties
+                path: log4j-console.properties
+        - name: job-artifacts-volume
+          hostPath:
+            path: /opt/flink/usrlib
+            type: DirectoryOrCreate
+        - name: job-data-volume
+          hostPath:
+            path: /opt/flink/data
+            type: DirectoryOrCreate

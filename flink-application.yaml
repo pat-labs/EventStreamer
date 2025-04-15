@@ -5,7 +5,7 @@ services:
     ports:
       - "8081:8081"
     command: >
-      standalone-job --jars /opt/flink/usrlib/flink-job-1.0.0.jar
+      standalone-job --jars /opt/flink/usrlib/${APP_HOST:-flink-job}-${APP_VERSION:1.0.0}.jar
     env_file:
      - .env
     environment:
@@ -13,7 +13,7 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
     volumes:
-      - ./flink-job/target:/opt/flink/usrlib/
+      - ./${APP_HOST:-flink-job}/target:/opt/flink/usrlib/
       - ./data:/opt/flink/data/
     networks:
       - public

@@ -189,3 +189,49 @@ Directory structure:
 * Refer to the official Apache Flink documentation for more detailed information on Flink concepts and configurations.
 * Ensure that the java version used to compile the jar is the same as the java version used to run Flink.
 * For production environments, consider using a more robust deployment strategy and monitoring tools.
+
+
+** PREREQUISITE Dockerfile**
+docker network create flink-network
+docker build -t my-flink-app -f DockerfileFlinkSqlApplication .
+
+** RUN IN PARALEL **
+FLINK_PROPERTIES="jobmanager.rpc.address: jobmanager"
+
+docker run \
+--mount type=bind,src=$(pwd)/job,target=/opt/flink/usrlib/ \
+--mount type=bind,src=$(pwd)/data,target=/opt/flink/data/ \
+--rm \
+--env FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
+--name=jobmanager \
+--network flink-network \
+my-flink-app standalone-job \
+--jars /opt/flink/usrlib/flink-table-job-1.0.0.jar \
+--job-classname org.apache.flink.DataStreamJob \
+/opt/flink/data/job.sql
+
+FLINK_PROPERTIES="jobmanager.rpc.address: jobmanager"
+
+docker run \
+--mount type=bind,src=$(pwd)/data,target=/opt/flink/data/ \
+--env FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
+--network flink-network \
+my-flink-app taskmanager
+
+kubectl get nodes -o wide
+kubectl delete -f pv-sc-pvc.yaml
+kubectl apply -f pv-sc-pvc.yaml
+
+minikube start --driver=docker --memory=8192 --cpus=4
+kubectl exec -it flink-jobmanager-b9cfdcd65-p9p9q  -- bash
+
+kubectl cp /home/patrick/Documents/projects/flink/data flink-jobmanager-68f444f548-w22vd:/opt/flink
+
+minikube ssh
+sudo chmod 777 /data
+scp -i $(minikube ssh-key) test.txt docker@$(minikube ip):/data
+
+kubectl port-forward flink-jobmanager-699cdc7bbb-px6g7 8081:8081
+
+sudo ufw allow 44980
+minikube mount --port=44980 /home/patrick/Documents/projects/flink/job/:/opt/flink/usrlib

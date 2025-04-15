@@ -12,7 +12,7 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
     volumes:
-      - ./flink-table-job/target:/opt/flink/usrlib/
+      - ./${APP_HOST:-flink-job}/target:/opt/flink/usrlib/
       - ./data:/opt/flink/data/
     networks:
       - public

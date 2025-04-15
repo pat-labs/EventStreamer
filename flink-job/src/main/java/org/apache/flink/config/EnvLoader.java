@@ -14,9 +14,9 @@ public class EnvLoader {
 
   public EnvLoader(String envFilePath) throws NumberFormatException {
     dotenv = Dotenv.configure().directory(envFilePath).ignoreIfMalformed().ignoreIfMissing().load();
-    appPath = dotenv.get("APP_PATH", "flink-job/src");
-    inputPath = dotenv.get("INPUT_PATH", "/data");
-    outputPath = dotenv.get("OUTPUT_PATH", "/data/output");
+    appPath = dotenv.get("APP_PATH", "/opt/flink/usrlib/flink-job/src");
+    inputPath = dotenv.get("INPUT_PATH", "/opt/flink/data");
+    outputPath = dotenv.get("OUTPUT_PATH", "/opt/flink/data/output");
 
     String isProductionStr = dotenv.get("IS_PRODUCTION", "0");
     Predicate<String> isProduction = s -> "1".equals(s);

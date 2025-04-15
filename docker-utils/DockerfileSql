@@ -1,0 +1,32 @@
+FROM flink:2.0.0-scala_2.12-java17
+
+# Build stage (using a multi-stage build)
+FROM maven:3.8.6-jdk-17 AS build
+
+WORKDIR /app
+
+# Copy pom.xml and download dependencies (cache layer)
+COPY ../flink-table-job/pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy the rest of the application source code
+COPY ../flink-table-job/src ./src
+
+# Build the application JAR
+RUN mvn package -DskipTests
+
+# Main stage
+FROM flink:2.0.0-scala_2.12-java17
+
+# Copy the built JAR from the build stage
+COPY --from=build /app/target/flink-table-job-*.jar /opt/flink/usrlib/
+
+# Copy the data directory
+COPY ../data /opt/flink/data/
+
+# Define volumes for data and usrlib. This allows you to mount host directories.
+VOLUME /opt/flink/usrlib
+VOLUME /opt/flink/data
+
+# Example CMD to run a Flink job. Adjust as needed.
+# CMD ["./bin/flink", "run", "/opt/flink/usrlib/flink-table-job-*.jar"]
